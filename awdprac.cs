@@ -285,4 +285,501 @@ namespace WebApplication1
   </Ad>
 </Advertisements>
 
+// 6 A, 8 A
+//aspx
 
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="prac6aand8a.aspx.cs" Inherits="prac6.WebForm2" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <style type="text/css">
+        #form1 {
+            height: 411px;
+        }
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <asp:Label ID="Label1" runat="server" Text="Enter name"></asp:Label>
+        <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
+        <div>
+
+        </div>
+        <asp:Label ID="Label2" runat="server" Text="Enter rollno"></asp:Label>
+        <asp:TextBox ID="TextBox2" runat="server"></asp:TextBox>
+        <p>
+            <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="INSERT" />
+            <asp:Label ID="Label3" runat="server"></asp:Label>
+        </p>
+        <p>
+            <asp:Label ID="Label4" runat="server" Text="Enter rno to delete record"></asp:Label>
+            <asp:TextBox ID="TextBox3" runat="server"></asp:TextBox>
+        </p>
+        <p>
+            <asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="DELETE" />
+            <asp:Label ID="Label5" runat="server"></asp:Label>
+        </p>
+        <p>
+            &nbsp;</p>
+        <p>
+            &nbsp;</p>
+        <p>
+            &nbsp;</p>
+        <p>
+            &nbsp;</p>
+    </form>
+</body>
+</html>
+
+// cs file
+
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace prac6
+{
+    public partial class WebForm2 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+        SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS;Initial Catalog=kada;Integrated Security=True;Pooling=False;Encrypt=False;");
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string s = TextBox1.Text;
+                int n = Convert.ToInt32(TextBox2.Text);
+                SqlCommand cmd = new SqlCommand("insert into dbo.Table_1 values(@s,@n)", con);
+                SqlDataAdapter ad = new SqlDataAdapter(cmd);
+                cmd.Parameters.AddWithValue("@s", s);
+                cmd.Parameters.AddWithValue("@n", n);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                Label3.Text = "Data Inserted Successfully";
+                Label3.ForeColor = System.Drawing.Color.Green;
+            }
+            catch(Exception ex)
+            {
+                Label3.Text = "ERROR:" + ex.Message;
+                Label3.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+        protected void Button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int n2 = Convert.ToInt32(TextBox3.Text);
+                SqlCommand cmd = new SqlCommand("delete from dbo.Table_1 where id=@n2", con);
+                SqlDataAdapter ad = new SqlDataAdapter(cmd);
+                cmd.Parameters.AddWithValue("@n2", n2);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                Label5.Text = "Data Deleted Successfully";
+                Label5.ForeColor = System.Drawing.Color.Green;
+            }
+            catch (Exception ex)
+            { 
+                Label5.Text = "Error Deleting Data:"+ex.Message;
+                Label5.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+
+        }
+    }
+
+
+// 8 b 
+//aspx
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="prac8b.aspx.cs" Inherits="prac6.WebForm4" %>
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>User Defined Exception Demo</title>
+    <style>
+        body { font-family: Arial; margin: 30px; }
+        input, button { margin: 5px; padding: 5px; }
+        h2 { color: #2a4d69; }
+    </style>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <h2>Enter Your Age</h2>
+        Age: <asp:TextBox ID="txtAge" runat="server"></asp:TextBox><br />
+        <asp:Button ID="btnSubmit" runat="server" Text="Submit" OnClick="btnSubmit_Click" /><br /><br />
+        <asp:Label ID="lblMessage" runat="server" ForeColor="Red"></asp:Label>
+    </form>
+</body>
+</html>
+
+// cs file
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using UserDefinedExceptionDemo;
+
+namespace prac6
+{
+    public partial class WebForm4 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnSubmit_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                int age = int.Parse(txtAge.Text);
+
+                // Throw custom exception if age < 18
+                if (age < 18)
+                    throw new InvalidAgeException("Age must be 18 or above to proceed.");
+
+                lblMessage.ForeColor = System.Drawing.Color.Green;
+                lblMessage.Text = "Age accepted: " + age;
+            }
+            catch (InvalidAgeException ex)
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "Custom Exception: " + ex.Message;
+            }
+            catch (FormatException)
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "Please enter a valid numeric age.";
+            }
+            catch (Exception ex)
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "Error: " + ex.Message;
+
+            }
+        }
+    }
+}
+
+// class1.cs
+
+using System;
+
+namespace UserDefinedExceptionDemo
+{
+    // Custom exception for invalid age
+    public class InvalidAgeException : ApplicationException
+    {
+        public InvalidAgeException() : base() { }
+
+        public InvalidAgeException(string message) : base(message) { }
+    }
+}
+
+
+
+
+// 10 B AJAX
+//aspx
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WebForm7.aspx.cs" Inherits="prac6.WebForm7" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            !-- Enables AJAX -->
+    <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
+
+    <!-- Only this section will refresh -->
+    <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+        <ContentTemplate>
+            <asp:Label ID="lblTime" runat="server" Text=""></asp:Label>
+            <br />
+            <asp:Button ID="btnUpdate" runat="server" Text="Update Time (AJAX)" OnClick="btnUpdate_Click" />
+        </ContentTemplate>
+    </asp:UpdatePanel>
+        </div>
+    </form>
+</body>
+</html>
+
+//cs file
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace prac6
+{
+    public partial class WebForm7 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void btnUpdate_Click(object sender, EventArgs e)
+        {
+            lblTime.Text = "Updated Time (AJAX): " + DateTime.Now.ToString();
+
+        }
+    }
+}
+
+//10 A BOOTSTRAP
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="WebForm8.aspx.cs" Inherits="prac6.WebForm8" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" /> 
+    <script src="Scripts/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <h2>BOOTSTRAP DEMO</h2>
+            <input type="button" id="mb" class="btn btn-primary" value="clcik me" />
+            <p id="message" class="mt-3"</p>
+            <script>
+                document.getElementById("mb").addEventListener("Click",function(){
+                    document.getElementById("message").textContent= "Button clicked! Hello, Bootstrap!";
+                })
+            </script>
+        </div>
+    </form>
+</body>
+</html>
+
+
+//9 B 
+//aspx
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="prac9b.aspx.cs" Inherits="prac6.WebForm5" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:FormView ID="FormView1" runat="server" DataKeyNames="rno" >
+                <ItemTemplate>
+                    stu_name:<%# Eval("stu_name") %><br /><br />rno:<%# Eval("rno") %>
+                </ItemTemplate>
+                
+            </asp:FormView>
+
+            <br />
+            <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="FORMVIEW" />
+            <asp:Label ID="Label1" runat="server"></asp:Label>
+            <br />
+            <br />
+            <br />
+            <asp:DetailsView ID="DetailsView1" runat="server" Height="50px" Width="125px" AllowPaging="True" OnPageIndexChanging="DetailsView1_PageIndexChanging">
+            </asp:DetailsView>
+            <br />
+            <asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="DETAILSVIEW" />
+            <asp:Label ID="Label2" runat="server"></asp:Label>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+
+        </div>
+    </form>
+</body>
+</html>
+
+// cs file
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace prac6
+{
+    public partial class WebForm5 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+        SqlConnection con = new SqlConnection("Data Source=mojiz\\sqlexpress;Initial Catalog=mojiz;Integrated Security=True;Pooling=False;Encrypt=False;");
+
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM table2", con);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                FormView1.DataSource = dt;
+                FormView1.DataBind();
+                Label1.Text = "Data Retrieved Successfully";
+                Label1.ForeColor = System.Drawing.Color.Green;
+            }
+            catch (Exception ex)
+            {
+                Label1.Text = "Error: " + ex.Message;
+                Label1.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+
+        protected void Button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand("select * from dbo.table2", con);
+                SqlDataAdapter ad = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                ad.Fill(dt);
+                DetailsView1.DataSource = dt;
+                DetailsView1.DataBind();
+                Label2.Text = "Data Retrieved Successfully";
+                Label2.ForeColor = System.Drawing.Color.Green;
+            }
+            catch (Exception ex)
+            {
+                Label2.Text = "Error: " + ex.Message;
+                Label2.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+
+        protected void DetailsView1_PageIndexChanging(object sender, DetailsViewPageEventArgs e)
+        {
+            DetailsView1.PageIndex = e.NewPageIndex;
+            
+        }
+    }
+}
+
+// 6 B 
+//aspx
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="prac6b.aspx.cs" Inherits="prac6.WebForm1" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:Label ID="Label1" runat="server" Text=""></asp:Label>
+        </div>
+        <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Button" />
+        <asp:GridView ID="GridView1" runat="server">
+        </asp:GridView>
+    </form>
+</body>
+</html>
+
+//cs file
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+namespace prac6
+{
+    public partial class WebForm1 : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+
+        }
+        SqlConnection con = new SqlConnection("Data Source=.\\SQLEXPRESS;Initial Catalog=kada;Integrated Security=True;Pooling=False;Encrypt=False;");
+        protected void Button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                SqlCommand cmd = new SqlCommand("select * from dbo.Table_1", con);
+                SqlDataAdapter ad=new SqlDataAdapter(cmd);
+                DataTable dt=new DataTable();
+                ad.Fill(dt);
+                GridView1.DataSource = dt;
+                GridView1.DataBind();
+                Label1.Text = "Data Retrieved Successfully";
+                Label1.ForeColor = System.Drawing.Color.Green;
+            }
+            catch (Exception ex)
+            {
+                Label1.Text = "Error: " + ex.Message;
+                Label1.ForeColor = System.Drawing.Color.Red;
+            }
+        }
+    }
+}
+
+//9 A
+//aspx
+
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="prac9a.aspx.cs" Inherits="prac6.WebForm3" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+</head>
+<body>
+    <form id="form1" runat="server">
+        <div>
+            <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:mojizConnectionString %>"
+                SelectCommand="SELECT * FROM [table2]"
+                UpdateCommand="update table2 set stu_name=@stu_name where rno=@rno"
+                 DeleteCommand="delete from table2 where rno=@rno"
+                 InsertCommand=""></asp:SqlDataSource>
+            <asp:GridView ID="GridView1" runat="server" AllowSorting="True" 
+                AutoGenerateDeleteButton="True" AutoGenerateEditButton="True" 
+                DataSourceID="SqlDataSource1" EnablePersistedSelection="True" 
+                EnableSortingAndPagingCallbacks="True" AllowPaging="True" 
+                DataKeyNames="rno" PageSize="5" >
+            </asp:GridView>
+        </div>
+    </form>
+</body>
+</html>
